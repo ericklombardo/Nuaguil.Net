@@ -1,0 +1,164 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="CONTENT-TYPE"
+ content="text/html; charset=windows-1252">
+  <title>Application lifecycle and functional modularization</title>
+  <meta name="GENERATOR" content="OpenOffice.org 3.2  (Win32)">
+  <meta name="AUTHOR" content="Bogdan Costea">
+  <meta name="CREATED" content="20110131;22445600">
+  <meta name="CHANGEDBY" content="Bogdan Costea">
+  <meta name="CHANGED" content="20110131;22562500">
+</head>
+<body style="color: rgb(0, 0, 0);" dir="ltr" alink="#ee0000"
+ lang="en-US" link="#0000ee" vlink="#551a8b">
+<h1>Application lifecycle and functional
+modularization</h1>
+<h2>Purpose and scope</h2>
+<p>This document describes in detail the lifecycle of the application
+as well as the means of modularization, including information about
+creating new application modules.</p>
+<p>The contents of this document relate only to SpectralSpring functional modules.</p>
+<h2>Technologies</h2>
+<h3>Spring.NET</h3>
+<blockquote type="cite">Spring.NET provides
+comprehensive
+infrastructural support for developing enterprise .NET applications.
+&nbsp;</blockquote>
+Spring.NET offers a lightweight DI/IoC container built around the
+concept of factories. Along with the IoC container, Spring.NET also
+contains a configuration container, along with a suite of services that
+can be applied to objects configured by the IoC container.<br>
+<br>
+More information:<br>
+&nbsp; &nbsp; <a href="http://www.springframework.net/">http://www.springframework.net/</a><br>
+&nbsp;&nbsp;&nbsp; <a
+ href="http://msdn.microsoft.com/en-us/magazine/cc163739.aspx">http://msdn.microsoft.com/en-us/magazine/cc163739.aspx</a><br>
+<h3>Microsoft P&amp;P Prism</h3>
+<blockquote type="cite">
+  <p>Prism provides guidance designed to help you more easily design
+and build rich, flexible, and easy-to-maintain Windows Presentation
+Foundation (WPF) desktop applications, Silverlight Rich Internet
+Applications (RIAs), and Windows Phone 7 applications. Using design
+patterns that embody important architectural design principles, such as
+separation of concerns and loose coupling, Prism helps you to design
+and build applications using loosely coupled components that can evolve
+independently but that can be easily and seamlessly integrated into the
+overall application. These types of applications are known as composite
+applications.</p>
+</blockquote>
+Prism offers the capability to create modularizable composite user
+interfaces by defining user interface regions that can accomodate any
+UserControl.<br>
+This capability, along with the Spring.NET IoC integration creates the
+posibility of fully dynamic modules that can extend the user interface,
+allowing with the application's capabilities.<br>
+<br>
+More information: <a href="http://compositewpf.codeplex.com/">http://compositewpf.codeplex.com/</a><br>
+<h3>Microsoft P&amp;P Common Service Locator</h3>
+<blockquote type="cite">The Common Service Locator library contains a
+shared interface for service location which application and framework
+developers can reference. <br>
+The library provides an abstraction over IoC containers and service
+locators.<br>
+</blockquote>
+<p>The Common Service Locator is used to glue together Prism and
+Spring.Net, allowing Prism to acces objects defined by the Spring.Net
+container.<br>
+</p>
+<p>More information: <a
+ href="http://commonservicelocator.codeplex.com/">http://commonservicelocator.codeplex.com/</a></p>
+<h2><br>
+</h2>
+<h2>Application lifecycle</h2>
+<h3>Application initialization steps</h3>
+1. Application starts up, configured with App.xaml as startup object.<br>
+2. App.xaml creates a custom Bootstrapper that extends <span
+ style="font-style: italic;">SpringBootstrapper</span> and defines a
+method that can create a module catalog and can retrieve the main shell
+of the application from the Spring.NET context.<br>
+3. App.xaml call's the Bootstrapper's <span style="font-style: italic;">Run</span>
+method that creates the Spring.NET container and configures the Prism
+objects (see the <span style="font-style: italic;">AddMandatoryObjects</span>
+and <span style="font-style: italic;">AddDefaultObjects </span>methods
+of SpringBootstrapper.<br>
+4. The Spring.NET container creates dependent objects, such as Data
+Access Objects and Business Objects, as well as other services. The
+SQLite embedded database is also created in this step.<br>
+5. SpringBootstrapper iterates through the modules present in the
+module catalog (<span style="font-style: italic;">SpringModuleCatalog</span>
+basically takes all container objects that extends <span
+ style="font-style: italic;">Module</span>) <span
+ style="font-style: italic;"></span>and creates instances.<br>
+6. Each module's lifecycle takes over control and create its own
+Spring.NET subcontext, registers one or more menus with the <span
+ style="font-style: italic;">MainMenuManager</span> and also declares a
+<span style="font-style: italic;">MainView </span>that will be added
+to the main application region.<br>
+7. After each module is initialized, the application menu is refrheshed
+and the main window can be considered initialized.<br>
+<br>
+<h3>Application teardown steps</h3>
+<span style="font-weight: bold; color: red;">TODO - no teardown yet</span><br>
+<br>
+<h2>Components of a functional module</h2>
+<h3>The module class</h3>
+Each functional module must have at least one class that extends <span
+ style="font-style: italic;">Module</span>.<br>
+This class must override the <span style="font-style: italic;">ModuleName</span>
+property, as well as the <span style="font-style: italic;">Initialize</span>
+method.<br>
+<br>
+The <span style="font-style: italic;">ModuleName</span> property must
+be unique, as it must uniquely identify the module inside the module
+catalog.<br>
+<br>
+The <span style="font-style: italic;">Initialize</span> method <span
+ style="font-weight: bold;">can</span> configure a Spring.NET
+subcontext for the module. This is not compulsory, as there may be some
+modules that do not need a subcontext.<br>
+The <span style="font-style: italic;">Initialize</span> method <span
+ style="font-weight: bold;">can</span> specify a <span
+ style="font-style: italic;">MainView</span> that will be added to
+Prism's <span style="font-style: italic;">RegionManager<span
+ style="font-style: italic;"><span style="font-style: italic;"></span></span></span>.<br>
+The <span style="font-style: italic;">Initialize</span> method <span
+ style="font-weight: bold;">can</span> specify one or more menu items
+for the application menu. If the module defines a <span
+ style="font-style: italic;">MainView</span>, a <span
+ style="font-style: italic;">SwitchViewMenuItem </span>can be used, to
+automatically activate the modules' MainView.<br>
+<br>
+Sample Module class:<br>
+<pre style="background-color: rgb(204, 204, 204);">using System;<br>using System.Collections.Generic;<br><br>using SpectralSpring.ModuleSupport;<br>using SpectralSpring.ModuleSupport.Ui;<br><br><br>namespace SpectralSpring.Sample.Module1<br>{<br>    public class SampleModuleOne : Module<br>    {<br><br>        public SampleModuleOne() {}<br><br>        public override void Initialize()<br>        {<br>            InitializeModuleContext("assembly://SpectralSpring.Sample.Module1/SpectralSpring.Sample.Module1.Config/SampleModuleOne.config");<br><br>            MainView = (ModuleView) ModuleContext.GetObject(ModuleName + "View");<br><br>            SwitchViewMenuItem menuItem = new SwitchViewMenuItem(ModuleName , MainView);<br>            MainMenuManager.AddMenuItem("general", 1000, menuItem);<br>        }<br><br>        public override string ModuleName<br>        {<br>            get { return "SampleModuleOne"; }<br>        }<br>    }<br>}<br></pre>
+<h3>The module context</h3>
+Each functional module can define a Spring.NET subcontext that can
+contain the modules' objects.<br>
+The modules' subcontext will be merged in the applications' main
+context, so that it has access to all objects defined in the main
+context.<br>
+The subcontext can contain any type of object.<br>
+<br>
+Sample module subcontext:<br>
+<pre style="background-color: rgb(204, 204, 204);">&lt;?xml version="1.0" encoding="utf-8" ?&gt;<br>&lt;objects xmlns="http://www.springframework.net"<br>         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"<br>         xsi:schemaLocation="http://www.springframework.net http://www.springframework.net/schema/objects/spring-objects.xsd"&gt;<br><br>  &lt;description&gt;Sample Module One configuration file.&lt;/description&gt;<br><br>  &lt;object id="messagesResourcesConfigurer" type="SpectralSpring.Utils.MessageResourcesConfigurer"&gt;<br>    &lt;constructor-arg name="bundles"&gt;<br>      &lt;list element-type="string"&gt;<br>        &lt;value&gt;/SpectralSpring.Sample.Module1;component/Strings/Messages&lt;/value&gt;<br>      &lt;/list&gt;<br>    &lt;/constructor-arg&gt;<br>  &lt;/object&gt;<br><br>  &lt;object id="SampleModuleOneView"<br>          type="SpectralSpring.Sample.Module1.Ui.ModuleOneView"/&gt;<br><br>&lt;/objects&gt;<br><br></pre>
+<br>
+<h3>The module view
+</h3>
+Each module can define multiple views, and one <span
+ style="font-style: italic;">MainView</span>.<br>
+The view can be any control that extends <span
+ style="font-style: italic;">ModuleView</span>, be it in XAML or custom
+c# WPF.<br>
+<span style="font-weight: bold;"><br>
+</span>
+<h3>Module resources</h3>
+Each module can contain resources such as string and image bundles.<br>
+<br>
+<span style="font-weight: bold;">Adding String Bundles<br>
+<br style="font-weight: bold;">
+</span><br>
+<span style="font-weight: bold;">Adding Image Bundles<br>
+<br style="font-weight: bold;">
+</span><br>
+</body>
+</html>

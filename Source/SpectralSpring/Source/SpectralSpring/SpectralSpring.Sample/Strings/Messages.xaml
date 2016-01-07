@@ -1,0 +1,20 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="ApplicationTitle">SpectralSpring Sample</system:String>
+
+
+    <system:String x:Key="OptionsMenuHeader">Options...</system:String>
+    <system:String x:Key="ExitMenuHeader">Exit</system:String>
+
+    <system:String x:Key="AddButtonLabel">Add</system:String>
+    <system:String x:Key="EditButtonLabel">Edit</system:String>
+    <system:String x:Key="DeleteButtonLabel">Delete</system:String>
+
+
+    <system:String x:Key="label.page">Page</system:String>
+    <system:String x:Key="label.records">Records</system:String>
+
+</ResourceDictionary>
+

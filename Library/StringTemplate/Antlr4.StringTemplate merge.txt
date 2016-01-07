@@ -1,0 +1,1 @@
+"..\..\tools\ilmerge" /t:library /internalize /out:merge/Antlr4.StringTemplate.dll  Antlr4.StringTemplate.dll Antlr3.Runtime.dll

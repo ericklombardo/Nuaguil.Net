@@ -1,0 +1,45 @@
+﻿<ss:RibbonedMainWindowShell x:Class="SpectralSpring.Sample.Ui.MainWindowShell"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:r="clr-namespace:Microsoft.Windows.Controls.Ribbon;assembly=RibbonControlsLibrary"
+    xmlns:ss="clr-namespace:SpectralSpring.ModuleSupport.Ui;assembly=SpectralSpring"
+    xmlns:cal="http://www.codeplex.com/prism"
+    Height="480" Width="640" 
+    ResizeMode="CanResizeWithGrip" 
+    WindowStartupLocation="CenterScreen"
+    Title="{StaticResource ApplicationTitle}">
+    
+    <DockPanel x:Name="LayoutRoot">
+        <r:Ribbon DockPanel.Dock="Top" 
+                  Title="{StaticResource ApplicationTitle}" 
+                  x:Name="ribbon"
+                  ShowQuickAccessToolBarOnTop="True" BorderThickness="1" 
+                  IsCollapsed="False" IsMinimized="True">
+            <r:Ribbon.ApplicationMenu>
+                <r:RibbonApplicationMenu Name="MainMenu"
+                                         CanAddToQuickAccessToolBarDirectly="True" 
+                                         SmallImageSource="{StaticResource ApplicationMenuIcon}" 
+                                         LargeImageSource="{StaticResource ApplicationMenuIcon}">
+                    
+                    <r:RibbonApplicationMenu.FooterPaneContent>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <StackPanel.Resources>
+                                <Style TargetType="{x:Type Button}">
+                                    <Setter Property="Margin" Value="5,0,0,0"/>
+                                </Style>
+                            </StackPanel.Resources>
+                            <Button Content="{StaticResource OptionsMenuHeader}" Width="80" />
+                            <Button Content="{StaticResource ExitMenuHeader}" Command="Close" Width="80" />
+                        </StackPanel>
+                    </r:RibbonApplicationMenu.FooterPaneContent>
+                </r:RibbonApplicationMenu>
+            </r:Ribbon.ApplicationMenu>
+
+        </r:Ribbon>
+        
+        <ContentControl  Name="MainRegion" cal:RegionManager.RegionName="MainRegion"
+                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="Auto" Height="Auto">
+        </ContentControl>
+    
+    </DockPanel>
+</ss:RibbonedMainWindowShell>
